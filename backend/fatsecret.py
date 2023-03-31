@@ -1,6 +1,9 @@
 import requests
 from requests_oauthlib import OAuth1
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 consumer_key = os.environ["CONSUMER_KEY"]
 consumer_secret = os.environ["CONSUMER_SECRET"]

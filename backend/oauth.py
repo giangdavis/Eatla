@@ -1,8 +1,16 @@
 from requests_oauthlib import OAuth1Session
 import os 
+from dotenv import load_dotenv
+
 # Replace these with your own FatSecret API credentials
+
+# load dot env 
+
+load_dotenv()
+
 CONSUMER_KEY = os.environ["CONSUMER_KEY"]
 CONSUMER_SECRET = os.environ["CONSUMER_SECRET"]
+
 
 # Step 1: Obtain a Request Token
 request_token_url = 'https://oauth.fatsecret.com/connect/request_token'
