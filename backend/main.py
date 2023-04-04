@@ -1,9 +1,12 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
 from dotenv import load_dotenv
-from requests_oauthlib import OAuth1Session
 import os
 from fastapi.middleware.cors import CORSMiddleware
+from fatsecret import Fatsecret 
+from pydantic import BaseModel
+import spacy
+from datetime import datetime
+
 
 load_dotenv()
 
@@ -11,6 +14,8 @@ CONSUMER_KEY = os.environ["CONSUMER_KEY"]
 CONSUMER_SECRET = os.environ["CONSUMER_SECRET"]
 
 app = FastAPI()
+fs = Fatsecret(CONSUMER_KEY, CONSUMER_SECRET)
+nlp = spacy.load("en_core_web_sm")
 
 origins = [
     "http://localhost",
@@ -35,48 +40,48 @@ class FoodEntryData(BaseModel):
     number_of_units: float
     meal: str
 
-class AccessTokenData(BaseModel):
-    oauth_token: str
-    oauth_verifier: str
+def parse_food_entry(text):
+    doc = nlp(text)
+    food_id = None
+    food_entry_name = None
+    serving_id = None
+    number_of_units = None
+    meal = None
 
-@app.get('/oauth/start') # DEBUG 
-async def start_oauth():
-    request_token_url = 'https://www.fatsecret.com/oauth/request_token'
-    oauth = OAuth1Session(CONSUMER_KEY, client_secret=CONSUMER_SECRET)
-    response = oauth.fetch_request_token(request_token_url)
-    print(response)
-    resource_owner_key = response.get('oauth_token')
-    resource_owner_secret = response.get('oauth_token_secret')
+    # Extract food information from the text
+    for token in doc:
+        # You can customize the conditions to extract the information you need
+        if token.ent_type_ == "PRODUCT":
+            food_entry_name = token.text
+        elif token.ent_type_ == "QUANTITY":
+            number_of_units = float(token.text)
+        # Add other conditions here to extract food_id, serving_id, and meal
 
-    # Store resource_owner_key and resource_owner_secret securely
+    # Set default values if the information is not available
+    food_id = food_id or "12345"  # Replace with a default food_id
+    serving_id = serving_id or "67890"  # Replace with a default serving_id
+    meal = meal or "other"
 
-    authorization_url = oauth.authorization_url('https://www.fatsecret.com/oauth/authorize')
-    return {'authorization_url': authorization_url}
+    return food_id, food_entry_name, serving_id, number_of_units, meal
+
+@app.get('/auth')
+async def get_auth_url():
+    auth_url = fs.get_authorize_url() 
+    return {'auth_url': auth_url}
+
+@app.get('/authenticate/{pin}')
+def authenticate_pin(pin: str):
+    session_token = fs.authenticate(pin)
+    return {'session_token': session_token}
+
+@app.get('/profile/{session_token}')
+def profile(session_token: str):
+    new_session = Fatsecret(CONSUMER_KEY, CONSUMER_SECRET, session_token=session_token)
+    food = new_session.foods_get_most_eaten()
+    return {'food': food}
 
 @app.post('/create_food_entry')
 def create_food_entry_route(food_entry_data: FoodEntryData):
-    # Replace this with your actual implementation
-    food_entry_id = food_entry_data.food_id
-    return {'food_entry_id': food_entry_id}
+    text = parse_food_entry(str(food_entry_data))
 
-@app.post('/oauth/access_token')
-async def get_access_token(access_token_data: AccessTokenData):
-    access_token_url = 'https://www.fatsecret.com/oauth/access_token'
-    
-    # Retrieve the resource_owner_secret associated with the oauth_token
-    # You should have saved it in step 2
-    resource_owner_secret = 'your_stored_resource_owner_secret'
 
-    oauth = OAuth1Session(CONSUMER_KEY,
-                          client_secret=CONSUMER_SECRET,
-                          resource_owner_key=access_token_data.oauth_token,
-                          resource_owner_secret=resource_owner_secret,
-                          verifier=access_token_data.oauth_verifier)
-    response = oauth.fetch_access_token(access_token_url)
-
-    access_token = response.get('oauth_token')
-    access_token_secret = response.get('oauth_token_secret')
-
-    # Store access_token and access_token_secret securely
-
-    return {'access_token': access_token, 'access_token_secret': access_token_secret}
