@@ -1,23 +1,43 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import axios from "axios";
-import { Box, TextArea, Button, NativeBaseProvider } from "native-base";
+import {
+  Box,
+  TextArea,
+  Button,
+  NativeBaseProvider,
+  FormControl,
+  Input,
+  VStack,
+} from "native-base";
 import * as SecureStore from "expo-secure-store";
 import { Linking } from "react-native";
 
 const API_BASE_URL = "http://192.168.165.184:8000";
 
+// example :
+// You can now use the sessionToken to make authorized requests
+// Example: Fetch the profile data
+// const profileResponse = await axios.get(
+//   `${API_BASE_URL}/profile/${sessionToken}`
+// );
+// console.log("Profile Data:", profileResponse.data);
+
+//todo: handle any errors that may occur when storing or retrieving data from SecureStore.
+
 const App = () => {
   const [userInput, setUserInput] = React.useState("");
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const [pin, setPin] = React.useState("");
 
   const checkAuthentication = async () => {
     try {
-      const accessToken = await SecureStore.getItemAsync("access_token");
-      const accessTokenSecret = await SecureStore.getItemAsync(
-        "access_token_secret"
-      );
-      if (accessToken && accessTokenSecret) {
+      console.log("checking authentication");
+      const accessToken = await SecureStore.getItemAsync("session_token");
+      // const accessTokenSecret = await SecureStore.getItemAsync(
+      //   "access_token_secret"
+      // );
+      if (accessToken) {
         setIsAuthenticated(true);
       } else {
         console.log("Not authenticated, starting OAuth flow...");
@@ -32,53 +52,34 @@ const App = () => {
   const startOAuth = async () => {
     try {
       console.log("in oauth start");
-      const response = await axios.get(`${API_BASE_URL}/oauth/start`);
-      console.log("OAuth Response:", response);
-      const authorizationUrl = response.data.authorization_url;
-      console.log("Authorization URL:", authorizationUrl);
-      // Open authorizationUrl in a browser or webview
+      const response = await axios.get(`${API_BASE_URL}/auth`);
+      const authorizationUrl = response.data.auth_url;
       Linking.openURL(authorizationUrl);
     } catch (error) {
       console.error("Error starting OAuth process:", error);
     }
   };
 
-  const handleOpenURL = async (event) => {
-    const { url } = event;
-    // Extract the oauth_token and oauth_verifier from the URL
-    const [, queryParams] = url.split("?");
-    const params = new URLSearchParams(queryParams);
-    const oauth_token = params.get("oauth_token");
-    const oauth_verifier = params.get("oauth_verifier");
+  const handlePin = async (pin) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/authenticate/${pin}`);
+      const sessionToken = response.data.session_token;
+      console.log("Session Token:", sessionToken);
 
-    if (oauth_token && oauth_verifier) {
-      // Send oauth_token and oauth_verifier to your backend
-      try {
-        const response = await axios.post(
-          `${API_BASE_URL}/oauth/access_token`,
-          {
-            oauth_token,
-            oauth_verifier,
-          }
-        );
-
-        const { access_token, access_token_secret } = response.data;
-        await SecureStorage.setItem("access_token", access_token);
-        await SecureStorage.setItem("access_token_secret", access_token_secret);
-
-        setIsAuthenticated(true);
-      } catch (error) {
-        console.error("Error getting access token:", error);
-      }
+      await SecureStore.setItemAsync("session_token", sessionToken.toString());
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error("Error handling PIN:", error);
     }
+  };
+
+  const handlePinSubmit = () => {
+    handlePin(pin);
+    setPin("");
   };
 
   React.useEffect(() => {
     checkAuthentication();
-    Linking.addEventListener("url", handleOpenURL);
-    return () => {
-      Linking.removeEventListener("url", handleOpenURL);
-    };
   }, []);
 
   const handleSendFoodEntry = async () => {
@@ -107,30 +108,52 @@ const App = () => {
   return (
     <NativeBaseProvider>
       <View style={styles.container}>
-        <Box w="100%" alignItems="center">
-          <TextArea
-            onChangeText={setUserInput}
-            value={userInput}
-            placeholder="Enter your food diary entry, include the meal, serving size, and food name.
-            For example: 'I had a burger for lunch, it was 1 serving of a McDonalds burger.'"
-            h={20}
-            w="75%"
-            //maxW="300px"
-            backgroundColor={"white"}
-            //borderColor="rgb(37,150,190)"
-            borderWidth={1}
-          />
-          <Button
-            title="Send Food Entry"
-            onPress={handleSendFoodEntry}
-            marginTop={4}
-            backgroundColor={"white"}
-            color="teal"
-            _text={{ color: "black" }}
-          >
-            Send
-          </Button>
-        </Box>
+        {!isAuthenticated && (
+          <Box w="100%" alignItems="center">
+            <FormControl>
+              <FormControl.Label>Enter PIN:</FormControl.Label>
+              <Input
+                value={pin}
+                onChangeText={setPin}
+                placeholder="Enter the PIN provided by FatSecret"
+              />
+            </FormControl>
+            <Button
+              onPress={handlePinSubmit}
+              marginTop={4}
+              backgroundColor={"white"}
+              color="teal"
+              _text={{ color: "black" }}
+            >
+              Submit PIN
+            </Button>
+          </Box>
+        )}
+
+        {isAuthenticated && (
+          <Box w="100%" alignItems="center">
+            <VStack space={4} w="75%">
+              <TextArea
+                onChangeText={setUserInput}
+                value={userInput}
+                placeholder="Enter your food diary entry, include the meal, serving size, and food name.
+                For example: 'I had a burger for lunch, it was 1 serving of a McDonalds burger.'"
+                h={20}
+                w="100%"
+                backgroundColor={"white"}
+                borderWidth={1}
+              />
+              <Button
+                onPress={handleSendFoodEntry}
+                backgroundColor={"white"}
+                color="teal"
+                _text={{ color: "black" }}
+              >
+                Send Food Entry
+              </Button>
+            </VStack>
+          </Box>
+        )}
       </View>
     </NativeBaseProvider>
   );
