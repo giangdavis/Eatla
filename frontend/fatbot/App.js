@@ -98,8 +98,7 @@ const App = () => {
         `${API_BASE_URL}/create_food_entry`,
         foodEntryData
       );
-      const foodEntryId = response.data.food_entry_id;
-      console.log("Created food entry with ID:", foodEntryId);
+      console.log("response", response.data);
     } catch (error) {
       console.error("Error sending food entry data:", error);
     }

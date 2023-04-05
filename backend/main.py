@@ -83,5 +83,6 @@ def profile(session_token: str):
 @app.post('/create_food_entry')
 def create_food_entry_route(food_entry_data: FoodEntryData):
     text = parse_food_entry(str(food_entry_data))
+    return {'text': text}
 
 
