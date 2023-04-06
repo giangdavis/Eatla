@@ -7,7 +7,6 @@ from pydantic import BaseModel
 import spacy
 from datetime import datetime
 
-
 load_dotenv()
 
 CONSUMER_KEY = os.environ["CONSUMER_KEY"]
@@ -49,13 +48,18 @@ def parse_food_entry(text):
     meal = None
 
     # Extract food information from the text
-    for token in doc:
-        # You can customize the conditions to extract the information you need
-        if token.ent_type_ == "PRODUCT":
-            food_entry_name = token.text
-        elif token.ent_type_ == "QUANTITY":
-            number_of_units = float(token.text)
-        # Add other conditions here to extract food_id, serving_id, and meal
+    for ent in doc.ents:
+        print(ent, ent.text, ent.label_)
+        if ent.label_ == "FOOD":
+            food_id = ent.text
+        elif ent.label_ == "FOOD_ENTRY_NAME":
+            food_entry_name = ent.text
+        elif ent.label_ == "SERVING":
+            serving_id = ent.text
+        elif ent.label_ == "NUMBER_OF_UNITS":
+            number_of_units = ent.text
+        elif ent.label_ == "MEAL":
+            meal = ent.text
 
     # Set default values if the information is not available
     food_id = food_id or "12345"  # Replace with a default food_id
