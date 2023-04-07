@@ -47,7 +47,6 @@ In backend
   6. Add Ubuntu to Windows Terminal: Open Windows Terminal and click the downward-facing arrow in the tab bar to open the drop-down menu. Click "Settings" to open the settings file in your default text editor. Scroll down to the "profiles" section and add the following to the "list" array:
 
   ```json
-  Copy code
   {
      "guid": "{insert-unique-guid-here}",
      "name": "Ubuntu",
