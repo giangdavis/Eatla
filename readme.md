@@ -2,22 +2,26 @@
 
 INSTALLATION:
 
-FRONTEND
-cd frontend/fatbot
-npm install
-
-BACKEND
-cd backend
-source venv/bin/activate
-pip3 install -r requirements.txt
-
-RUNNING THE APPLICATION:
+### FRONTEND
+```
+  cd frontend/fatbot
+  npm install
+```
+### BACKEND
+```
+  cd backend
+  source venv/bin/activate
+  pip3 install -r requirements.txt
+```
+### RUNNING THE APPLICATION:
 In frontend/fatbot
-npx expo start
-
+```
+  npx expo start
+```
 In backend
-uvicorn main:app --reload
-
+```
+  uvicorn main:app --reload
+```
 
 
 
@@ -42,7 +46,7 @@ uvicorn main:app --reload
 
   6. Add Ubuntu to Windows Terminal: Open Windows Terminal and click the downward-facing arrow in the tab bar to open the drop-down menu. Click "Settings" to open the settings file in your default text editor. Scroll down to the "profiles" section and add the following to the "list" array:
 
-  json
+  ```json
   Copy code
   {
      "guid": "{insert-unique-guid-here}",
@@ -50,6 +54,7 @@ uvicorn main:app --reload
      "commandline": "wsl.exe -d Ubuntu",
      "icon": "path/to/icon"
   }
+  ```
 Replace "{insert-unique-guid-here}" with a unique identifier, and "path/to/icon" with the path to an icon image you want to use for the Ubuntu profile.
 
   7. Save the settings file and restart Windows Terminal: Save the settings file and restart Windows Terminal. You should now see the Ubuntu profile in the drop-down menu.
