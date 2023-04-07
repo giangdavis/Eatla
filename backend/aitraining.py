@@ -1,19 +1,8 @@
 import spacy
 from spacy.util import minibatch, compounding
 from spacy.training import Example
+from trainingdata import TRAINING_DATA
 
-TRAIN_DATA = [
-    ("I had 1 serving of pizza for dinner.", {
-        "entities": [(9, 10, "NUMBER_OF_UNITS"), (19, 24, "FOOD_NAME"), (29, 35, "MEAL")]
-    }),
-    ("2 servings of pasta for lunch today.", {
-        "entities": [(0, 1, "NUMBER_OF_UNITS"), (12, 17, "FOOD_NAME"), (22, 27, "MEAL")]
-    }),
-        ("I had 2 slices of pizza for dinner.", {"entities": [(7, 8, "num_of_units"), (15, 20, "food_name"), (24, 30, "meal")]}),
-    ("3 tacos for lunch", {"entities": [(0, 1, "num_of_units"), (2, 7, "food_name"), (11, 16, "meal")]}),
-    # Add more examples
-    # Add more training examples here
-] 
 
 def train_ner_model(training_data, n_iter=20):
     nlp = spacy.blank("en")
@@ -28,12 +17,14 @@ def train_ner_model(training_data, n_iter=20):
     for itn in range(n_iter):
         for raw_text, entity_offsets in training_data:
             doc = nlp.make_doc(raw_text)
-            example = Example.from_dict(doc, {"entities": entity_offsets["entities"]})
+            example = Example.from_dict(
+                doc, {"entities": entity_offsets["entities"]})
             nlp.update([example], sgd=optimizer)
 
     return nlp
 
-nlp = train_ner_model(training_data)
+
+nlp = train_ner_model(TRAINING_DATA)
 
 nlp.to_disk("./food_ner_model")
 
