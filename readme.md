@@ -32,9 +32,10 @@ In backend
 
   1. Enable WSL 2 on Windows: To use WSL 2, you need to have Windows 10 version 1903 or higher installed on your system. You also need to enable WSL 2 feature on your Windows machine. To do this, open PowerShell as an administrator and run the following command:
 
-  bash
+  ```
   dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
   dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+  ```
   
   2. Download and install the Linux kernel update package: To use WSL 2, you need to download and install the Linux kernel update package. You can download it from the official Microsoft website.
 
