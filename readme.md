@@ -58,3 +58,11 @@ In backend
 Replace "{insert-unique-guid-here}" with a unique identifier, and "path/to/icon" with the path to an icon image you want to use for the Ubuntu profile.
 
   7. Save the settings file and restart Windows Terminal: Save the settings file and restart Windows Terminal. You should now see the Ubuntu profile in the drop-down menu.
+  8. Install Python via Ubuntu WSL terminal command line, and validate that it is installed properly:
+    ```
+    sudo apt update
+    sudo apt install python3
+    python3 --version
+    sudo apt install python3-pip
+    pip3 -- version
+    ```
