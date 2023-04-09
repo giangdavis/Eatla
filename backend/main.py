@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from dotenv import load_dotenv
 import os
 from fastapi.middleware.cors import CORSMiddleware
-from fatsecret import Fatsecret 
+from fatsecret import Fatsecret
 from pydantic import BaseModel
 import spacy
 from datetime import datetime
@@ -21,7 +21,7 @@ origins = [
     "http://localhost:8000",
     "exp://",
     "*",
-    "192.168.165.184:19000" # Replace with your local IP address
+    "192.168.165.184:19000"  # Replace with your local IP address
 ]
 
 app.add_middleware(
@@ -32,12 +32,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 class FoodEntryData(BaseModel):
     food_id: int
     food_entry_name: str
     serving_id: int
     number_of_units: float
     meal: str
+
 
 def parse_food_entry(text):
     doc = nlp(text)
@@ -68,21 +70,26 @@ def parse_food_entry(text):
 
     return food_id, food_entry_name, serving_id, number_of_units, meal
 
+
 @app.get('/auth')
 async def get_auth_url():
-    auth_url = fs.get_authorize_url() 
+    auth_url = fs.get_authorize_url()
     return {'auth_url': auth_url}
+
 
 @app.get('/authenticate/{pin}')
 def authenticate_pin(pin: str):
     session_token = fs.authenticate(pin)
     return {'session_token': session_token}
 
+
 @app.get('/profile/{session_token}')
 def profile(session_token: str):
-    new_session = Fatsecret(CONSUMER_KEY, CONSUMER_SECRET, session_token=session_token)
+    new_session = Fatsecret(CONSUMER_KEY, CONSUMER_SECRET,
+                            session_token=session_token)
     food = new_session.foods_get_most_eaten()
     return {'food': food}
+
 
 @app.post('/create_food_entry')
 def create_food_entry_route(food_entry_data: FoodEntryData):
@@ -90,3 +97,6 @@ def create_food_entry_route(food_entry_data: FoodEntryData):
     return {'text': text}
 
 
+@app.get("/test_connection")
+async def test_connection():
+    return {"message": "connection successful"}

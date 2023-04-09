@@ -1,6 +1,7 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import axios from "axios";
+import * as WebBrowser from "expo-web-browser";
 import {
   Box,
   TextArea,
@@ -13,15 +14,8 @@ import {
 import * as SecureStore from "expo-secure-store";
 import { Linking } from "react-native";
 
-const API_BASE_URL = "http://192.168.165.184:8000";
-
-// example :
-// You can now use the sessionToken to make authorized requests
-// Example: Fetch the profile data
-// const profileResponse = await axios.get(
-//   `${API_BASE_URL}/profile/${sessionToken}`
-// );
-// console.log("Profile Data:", profileResponse.data);
+const API_BASE_URL = "http://192.168.165.184:8001";
+const TOKEN_DURATION = 3 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
 
 //todo: handle any errors that may occur when storing or retrieving data from SecureStore.
 
@@ -30,17 +24,37 @@ const App = () => {
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
   const [pin, setPin] = React.useState("");
 
+  //reset secure store
+  const resetSecureStore = async () => {
+    try {
+      await SecureStore.deleteItemAsync("session_token");
+      await SecureStore.deleteItemAsync("token_timestamp");
+      console.log("SecureStore reset successfully");
+    } catch (error) {
+      console.error("Error resetting SecureStore:", error);
+    }
+  };
+  //call resetSecureStore() to reset the secure store when you want to start the OAuth flow again
+  //resetSecureStore();
+
   const checkAuthentication = async () => {
     try {
       console.log("checking authentication");
       const accessToken = await SecureStore.getItemAsync("session_token");
-      // const accessTokenSecret = await SecureStore.getItemAsync(
-      //   "access_token_secret"
-      // );
-      if (accessToken) {
-        setIsAuthenticated(true);
+      const tokenTimestamp = await SecureStore.getItemAsync("token_timestamp");
+
+      if (accessToken && tokenTimestamp) {
+        const currentTime = new Date().getTime();
+        const tokenAge = currentTime - parseInt(tokenTimestamp, 10);
+
+        if (tokenAge < TOKEN_DURATION) {
+          setIsAuthenticated(true);
+        } else {
+          console.log("Session token expired, starting OAuth flow...");
+          startOAuth();
+        }
       } else {
-        console.log("Not authenticated, starting OAuth flow...");
+        console.log("Session token not found, starting OAuth flow...");
         startOAuth();
       }
     } catch (error) {
@@ -54,7 +68,9 @@ const App = () => {
       console.log("in oauth start");
       const response = await axios.get(`${API_BASE_URL}/auth`);
       const authorizationUrl = response.data.auth_url;
-      Linking.openURL(authorizationUrl);
+      console.log("Authorization URL:", authorizationUrl);
+      //Linking.openURL(authorizationUrl);
+      const result = await WebBrowser.openBrowserAsync(authorizationUrl);
     } catch (error) {
       console.error("Error starting OAuth process:", error);
     }
@@ -67,6 +83,10 @@ const App = () => {
       console.log("Session Token:", sessionToken);
 
       await SecureStore.setItemAsync("session_token", sessionToken.toString());
+      await SecureStore.setItemAsync(
+        "token_timestamp",
+        new Date().getTime().toString()
+      );
       setIsAuthenticated(true);
     } catch (error) {
       console.error("Error handling PIN:", error);
@@ -78,7 +98,18 @@ const App = () => {
     setPin("");
   };
 
+  const testApiConnection = async () => {
+    try {
+      console.log("Testing API connection...");
+      const response = await axios.get(`${API_BASE_URL}/test_connection`);
+      console.log("API connection test:", response.data);
+    } catch (error) {
+      console.error("Error testing API connection:", error);
+    }
+  };
+
   React.useEffect(() => {
+    testApiConnection();
     checkAuthentication();
   }, []);
 
