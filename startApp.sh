@@ -16,17 +16,20 @@ echo "FRONTENDAPPDIR PATH SET TO: ${FRONTENDAPPDIR}"
 echo "BACKENDAPPDIR PATH SET TO: ${BACKENDAPPDIR}"
 
 
-echo "ENTERING FRONTEND APP DIRECTORY: ${FRONTENDAPPDIR}"
-cd ${FRONTENDAPPDIR}; npm install
+#!/bin/bash
 
-echo "ENTERING BACKEND APP DIRECTORY: ${FRONTENDAPPDIR}"
-cd ${BACKENDAPPDIR}; source venv/bin/activate; pip3 install -r requirements.txt
-
-
-echo "ENTERING FRONTEND APP DIRECTORY: ${FRONTENDAPPDIR}"
-cd ${FRONTENDAPPDIR}; npx expo start
-
-echo "ENTERING BACKEND APP DIRECTORY: ${FRONTENDAPPDIR}"
-cd ${BACKENDAPPDIR}; uvicorn main:app --reload
+# Detect the operating system
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    # Linux OS
+    cd $BACKENDAPPDIR && uvicorn main:app --host 0.0.0.0 --port 8001 &
+    cd $FRONTENDAPPDIR && npx expo start
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS
+    cd $BACKENDAPPDIR && uvicorn main:app --host 0.0.0.0 --port 8001 &
+    osascript -e 'tell app "Terminal" to do script "cd '$FRONTENDAPPDIR' && npx expo start"'
+else
+    echo "Unsupported operating system: $OSTYPE"
+    exit 1
+fi
 
 
