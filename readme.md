@@ -2,54 +2,84 @@
 
 INSTALLATION:
 
-FRONTEND
-cd frontend/fatbot
-npm install
+### FRONTEND
 
-BACKEND
-cd backend
-source venv/bin/activate
-pip3 install -r requirements.txt
+```
+  cd frontend/fatbot
+  npm install
+```
 
-RUNNING THE APPLICATION:
+### BACKEND
+
+```
+  cd backend
+  source venv/bin/activate
+  pip3 install -r requirements.txt
+```
+
+### RUNNING THE APPLICATION:
+
 In frontend/fatbot
-npx expo start
+
+```
+  npx expo start
+```
 
 In backend
-uvicorn main:app --reload
 
+```
+  uvicorn main:app --reload --host 0.0.0.0 --port 8001
 
+```
 
+### PORTS:
 
+```
+If expo is running on exp://192.168.165.184:19000
+Add to 'origins' in main.py
+Change API_BASE_URL in App.js to 192.168.165.184:<unicorn port>
+```
 
 # Windows Dev Environment Setup Steps from a fresh windows 10 OS install:
 
 ### Here are the steps to set up WSL 2 Ubuntu via Windows Terminal:
 
-  1. Enable WSL 2 on Windows: To use WSL 2, you need to have Windows 10 version 1903 or higher installed on your system. You also need to enable WSL 2 feature on your Windows machine. To do this, open PowerShell as an administrator and run the following command:
+1. Enable WSL 2 on Windows: To use WSL 2, you need to have Windows 10 version 1903 or higher installed on your system. You also need to enable WSL 2 feature on your Windows machine. To do this, open PowerShell as an administrator and run the following command:
 
-  bash
-  dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
-  dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
-  
-  2. Download and install the Linux kernel update package: To use WSL 2, you need to download and install the Linux kernel update package. You can download it from the official Microsoft website.
+```
+dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+```
 
-  3. Download and install Ubuntu from the Microsoft Store: To download and install Ubuntu on your Windows machine, open the Microsoft Store app and search for        "Ubuntu."     Click the "Get" button to download and install it.
+2. Download and install the Linux kernel update package: To use WSL 2, you need to download and install the Linux kernel update package. You can download it from the official Microsoft website.
 
-  4. Launch Ubuntu and set up your username and password: Once the installation is complete, launch Ubuntu from the Start menu. You will be prompted to set up your username and password.
+3. Download and install Ubuntu from the Microsoft Store: To download and install Ubuntu on your Windows machine, open the Microsoft Store app and search for "Ubuntu." Click the "Get" button to download and install it.
 
-  5. Install Windows Terminal: Windows Terminal is a new terminal application that allows you to run multiple shells and command-line applications simultaneously. You can download and install it from the Microsoft Store.
+4. Launch Ubuntu and set up your username and password: Once the installation is complete, launch Ubuntu from the Start menu. You will be prompted to set up your username and password.
 
-  6. Add Ubuntu to Windows Terminal: Open Windows Terminal and click the downward-facing arrow in the tab bar to open the drop-down menu. Click "Settings" to open the settings file in your default text editor. Scroll down to the "profiles" section and add the following to the "list" array:
+5. Install Windows Terminal: Windows Terminal is a new terminal application that allows you to run multiple shells and command-line applications simultaneously. You can download and install it from the Microsoft Store.
 
-  json
-  Copy code
-  {
-     "guid": "{insert-unique-guid-here}",
-     "name": "Ubuntu",
-     "commandline": "wsl.exe -d Ubuntu",
-     "icon": "path/to/icon"
-  }
+6. Add Ubuntu to Windows Terminal: Open Windows Terminal and click the downward-facing arrow in the tab bar to open the drop-down menu. Click "Settings" to open the settings file in your default text editor. Scroll down to the "profiles" section and add the following to the "list" array:
+
+```json
+{
+  "guid": "{insert-unique-guid-here}",
+  "name": "Ubuntu",
+  "commandline": "wsl.exe -d Ubuntu",
+  "icon": "path/to/icon"
+}
+```
+
 Replace "{insert-unique-guid-here}" with a unique identifier, and "path/to/icon" with the path to an icon image you want to use for the Ubuntu profile.
 
-  7. Save the settings file and restart Windows Terminal: Save the settings file and restart Windows Terminal. You should now see the Ubuntu profile in the drop-down menu.
+7. Save the settings file and restart Windows Terminal: Save the settings file and restart Windows Terminal. You should now see the Ubuntu profile in the drop-down menu.
+8. Install Python via Ubuntu WSL terminal command line, and validate that it is installed properly:
+
+
+    ```
+    sudo apt update
+    sudo apt install python3
+    python3 --version
+    sudo apt install python3-pip
+    pip3 -- version
+    ```
