@@ -21,7 +21,7 @@ origins = [
     "http://localhost:8000",
     "exp://",
     "*",
-    "192.168.165.184:19000"  # Replace with your local IP address
+    "192.168.165.184:19000",  # Replace with your local IP address
 ]
 
 app.add_middleware(
@@ -71,30 +71,29 @@ def parse_food_entry(text):
     return food_id, food_entry_name, serving_id, number_of_units, meal
 
 
-@app.get('/auth')
+@app.get("/auth")
 async def get_auth_url():
     auth_url = fs.get_authorize_url()
-    return {'auth_url': auth_url}
+    return {"auth_url": auth_url}
 
 
-@app.get('/authenticate/{pin}')
+@app.get("/authenticate/{pin}")
 def authenticate_pin(pin: str):
     session_token = fs.authenticate(pin)
-    return {'session_token': session_token}
+    return {"session_token": session_token}
 
 
-@app.get('/profile/{session_token}')
+@app.get("/profile/{session_token}")
 def profile(session_token: str):
-    new_session = Fatsecret(CONSUMER_KEY, CONSUMER_SECRET,
-                            session_token=session_token)
+    new_session = Fatsecret(CONSUMER_KEY, CONSUMER_SECRET, session_token=session_token)
     food = new_session.foods_get_most_eaten()
-    return {'food': food}
+    return {"food": food}
 
 
-@app.post('/create_food_entry')
+@app.post("/create_food_entry")
 def create_food_entry_route(food_entry_data: FoodEntryData):
     text = parse_food_entry(str(food_entry_data))
-    return {'text': text}
+    return {"text": text}
 
 
 @app.get("/test_connection")
