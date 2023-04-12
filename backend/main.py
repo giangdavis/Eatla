@@ -62,6 +62,8 @@ def parse_food_entry(text):
             food_name = ent.text
         elif ent.label_ == "meal":
             meal = ent.text
+    print(f"food_name: {food_name}")
+    print(f"meal: {meal}")
 
     return {"food_name": food_name, "meal": meal}
 
@@ -87,9 +89,8 @@ def profile(session_token: str):
 
 @app.post("/create_food_entry")
 def create_food_entry(food_entry_data: FoodEntryData):
-    return {"text": food_entry_data.text}
-    # text = parse_food_entry(food_entry_data)
-    # return {"text": text}
+    text = parse_food_entry(food_entry_data)
+    return {"text": text}
 
 
 @app.get("/test_connection")
