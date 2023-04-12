@@ -14,7 +14,7 @@ CONSUMER_SECRET = os.environ["CONSUMER_SECRET"]
 
 app = FastAPI()
 fs = Fatsecret(CONSUMER_KEY, CONSUMER_SECRET)
-nlp = spacy.load("en_core_web_sm")
+nlp = spacy.load("./food_ner_model")
 
 origins = [
     "http://localhost",
@@ -56,11 +56,11 @@ def parse_food_entry(text):
 
     food_name = None
     meal = None
-
+    print(f"food from user input :{text}")
     for ent in doc.ents:
-        if ent.label_ == "food_name":
+        if ent.label_ == "FOOD_NAME":
             food_name = ent.text
-        elif ent.label_ == "meal":
+        elif ent.label_ == "MEAL":
             meal = ent.text
     print(f"food_name: {food_name}")
     print(f"meal: {meal}")
@@ -89,7 +89,8 @@ def profile(session_token: str):
 
 @app.post("/create_food_entry")
 def create_food_entry(food_entry_data: FoodEntryData):
-    text = parse_food_entry(food_entry_data)
+    # print(f"got {food_entry_data.text}")
+    text = parse_food_entry(food_entry_data.text)
     return {"text": text}
 
 

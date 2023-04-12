@@ -10,16 +10,12 @@ for ent in doc.ents:
 
 food_name = None
 meal = None
-number_of_units = None
 
 for ent in doc.ents:
-    if ent.label_ == "food_name":
+    if ent.label_ == "FOOD_NAME":
         food_name = ent.text
-    elif ent.label_ == "meal":
+    elif ent.label_ == "MEAL":
         meal = ent.text
-    elif ent.label_ == "num_of_units":
-        number_of_units = float(ent.text)
 
 print("Food name:", food_name)
 print("Meal:", meal)
-print("Number of units:", number_of_units)
