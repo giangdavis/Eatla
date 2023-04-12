@@ -18,9 +18,8 @@
   },
   "labels":{
     "ner":[
-      "food_name",
-      "meal",
-      "num_of_units"
+      "FOOD_NAME",
+      "MEAL"
     ]
   },
   "pipeline":[

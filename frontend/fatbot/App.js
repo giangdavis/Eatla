@@ -2,6 +2,7 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import axios from "axios";
 import * as WebBrowser from "expo-web-browser";
+import qs from "qs";
 import {
   Box,
   TextArea,
@@ -113,21 +114,17 @@ const App = () => {
     checkAuthentication();
   }, []);
 
+  //send the food diary entry to the backend
   const handleSendFoodEntry = async () => {
-    // Add your code here to process userInput using spaCy and obtain foodEntryData
-    // For the sake of the example, we use hardcoded values
-    const foodEntryData = {
-      food_id: 12345,
-      food_entry_name: "McDonalds Burger",
-      serving_id: 67890,
-      number_of_units: 1,
-      meal: "lunch",
-    };
-
     try {
+      const food_entry_data = {
+        text: userInput,
+      };
+      console.log("food_entry_data", food_entry_data);
+
       const response = await axios.post(
         `${API_BASE_URL}/create_food_entry`,
-        foodEntryData
+        (json = food_entry_data)
       );
       console.log("response", response.data);
     } catch (error) {

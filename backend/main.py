@@ -1,11 +1,11 @@
+import os
+from datetime import datetime
 from fastapi import FastAPI
 from dotenv import load_dotenv
-import os
 from fastapi.middleware.cors import CORSMiddleware
 from fatsecret import Fatsecret
 from pydantic import BaseModel
 import spacy
-from datetime import datetime
 
 load_dotenv()
 
@@ -33,42 +33,37 @@ app.add_middleware(
 )
 
 
+class Data(BaseModel):
+    user: str
+
+
 class FoodEntryData(BaseModel):
-    food_id: int
-    food_entry_name: str
-    serving_id: int
-    number_of_units: float
-    meal: str
+    """
+    Represents a food entry submitted by a user.
+
+    Fields:
+    - text: str - the text of the food entry
+    """
+
+    text: str
 
 
+# i have two labels: meal and food_name
+# i want to extract the meal and food_name from the text
+# and then return the meal and food_name as a dictionary
 def parse_food_entry(text):
     doc = nlp(text)
-    food_id = None
-    food_entry_name = None
-    serving_id = None
-    number_of_units = None
+
+    food_name = None
     meal = None
 
-    # Extract food information from the text
     for ent in doc.ents:
-        print(ent, ent.text, ent.label_)
-        if ent.label_ == "FOOD":
-            food_id = ent.text
-        elif ent.label_ == "FOOD_ENTRY_NAME":
-            food_entry_name = ent.text
-        elif ent.label_ == "SERVING":
-            serving_id = ent.text
-        elif ent.label_ == "NUMBER_OF_UNITS":
-            number_of_units = ent.text
-        elif ent.label_ == "MEAL":
+        if ent.label_ == "food_name":
+            food_name = ent.text
+        elif ent.label_ == "meal":
             meal = ent.text
 
-    # Set default values if the information is not available
-    food_id = food_id or "12345"  # Replace with a default food_id
-    serving_id = serving_id or "67890"  # Replace with a default serving_id
-    meal = meal or "other"
-
-    return food_id, food_entry_name, serving_id, number_of_units, meal
+    return {"food_name": food_name, "meal": meal}
 
 
 @app.get("/auth")
@@ -91,9 +86,10 @@ def profile(session_token: str):
 
 
 @app.post("/create_food_entry")
-def create_food_entry_route(food_entry_data: FoodEntryData):
-    text = parse_food_entry(str(food_entry_data))
-    return {"text": text}
+def create_food_entry(food_entry_data: FoodEntryData):
+    return {"text": food_entry_data.text}
+    # text = parse_food_entry(food_entry_data)
+    # return {"text": text}
 
 
 @app.get("/test_connection")

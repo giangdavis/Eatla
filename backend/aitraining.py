@@ -1,7 +1,28 @@
+import json
 import spacy
 from spacy.util import minibatch, compounding
 from spacy.training import Example
 from trainingdata import TRAINING_DATA
+
+
+# call this function to convert the annotations.json file to the format that spacy needs,
+# take the output and put it in the TRAINING_DATA variable
+def convert_annotations():
+    food_entity = "FOOD"
+
+    with open("annotations.json", "r") as f:
+        data = json.load(f)
+
+    trained_data = data["annotations"]
+    trained_data = [tuple(i) for i in trained_data]
+
+    for i in trained_data:
+        if i[1]["entities"] == []:
+            i[1]["entities"] = (0, 0, food_entity)
+        else:
+            i[1]["entities"][0] = tuple(i[1]["entities"][0])
+
+    print(trained_data)
 
 
 def train_ner_model(training_data, n_iter=20):
