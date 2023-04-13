@@ -13,7 +13,6 @@ import {
   VStack,
 } from "native-base";
 import * as SecureStore from "expo-secure-store";
-import { Linking } from "react-native";
 import dotenv from 'dotenv';
 
 require('dotenv').config({ path: '../../.env' });
@@ -27,6 +26,10 @@ const TOKEN_DURATION = 3 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
 
 const App = () => {
   const [userInput, setUserInput] = React.useState("");
+<<<<<<< HEAD
+=======
+  //temp state until OAuth is implemented
+>>>>>>> 72eb9fa586c97437e244c50e66cf8723be1b40ce
   const [isAuthenticated, setIsAuthenticated] = React.useState(true);
   const [pin, setPin] = React.useState("");
 
@@ -116,7 +119,11 @@ const App = () => {
 
   React.useEffect(() => {
     testApiConnection();
+<<<<<<< HEAD
     // checkAuthentication();
+=======
+    //checkAuthentication();
+>>>>>>> 72eb9fa586c97437e244c50e66cf8723be1b40ce
   }, []);
 
   //send the food diary entry to the backend
