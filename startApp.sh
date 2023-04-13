@@ -25,10 +25,12 @@ if lsof -Pi :${PORT} -sTCP:LISTEN -t >/dev/null ; then
 fi
 
 # Detect the operating system
+echo "$OSTYPE"
+
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    # Linux OS
+    # Linux O
     cd $BACKENDAPPDIR && uvicorn main:app --host 0.0.0.0 --port $PORT &
-    cd $FRONTENDAPPDIR && npx expo start
+    cd $FRONTENDAPPDIR && npm run start:tunnel
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     # macOS
     cd $BACKENDAPPDIR && uvicorn main:app --host 0.0.0.0 --port $PORT &

@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from pydantic import BaseModel
 import spacy
 
-load_dotenv()
+load_dotenv("../.env")
 
 app = FastAPI()
 nlp = spacy.load("./food_ner_model")
@@ -15,7 +15,7 @@ origins = [
     "http://localhost:8000",
     "exp://",
     "*",
-    "192.168.165.184:19000",  # Replace with your local IP address
+    os.environ["EXPO_URL"],
 ]
 
 app.add_middleware(
