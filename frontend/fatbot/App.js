@@ -13,7 +13,6 @@ import {
   VStack,
 } from "native-base";
 import * as SecureStore from "expo-secure-store";
-import { Linking } from "react-native";
 
 const API_BASE_URL = "http://192.168.165.184:8001";
 const TOKEN_DURATION = 3 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
@@ -22,7 +21,8 @@ const TOKEN_DURATION = 3 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
 
 const App = () => {
   const [userInput, setUserInput] = React.useState("");
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  //temp state until OAuth is implemented
+  const [isAuthenticated, setIsAuthenticated] = React.useState(true);
   const [pin, setPin] = React.useState("");
 
   //reset secure store
@@ -111,7 +111,7 @@ const App = () => {
 
   React.useEffect(() => {
     testApiConnection();
-    checkAuthentication();
+    //checkAuthentication();
   }, []);
 
   //send the food diary entry to the backend
