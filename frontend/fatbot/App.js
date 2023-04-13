@@ -14,15 +14,20 @@ import {
 } from "native-base";
 import * as SecureStore from "expo-secure-store";
 import { Linking } from "react-native";
+import dotenv from 'dotenv';
 
-const API_BASE_URL = "http://192.168.165.184:8001";
+require('dotenv').config({ path: '../../.env' });
+// const expoUrl = process.env.EXPO_URL;
+// console.log(expoUrl);
+
+const API_BASE_URL = "http://iord5a4.anonymous.19000.exp.direct:8001";
 const TOKEN_DURATION = 3 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
 
 //todo: handle any errors that may occur when storing or retrieving data from SecureStore.
 
 const App = () => {
   const [userInput, setUserInput] = React.useState("");
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const [isAuthenticated, setIsAuthenticated] = React.useState(true);
   const [pin, setPin] = React.useState("");
 
   //reset secure store
@@ -36,7 +41,7 @@ const App = () => {
     }
   };
   //call resetSecureStore() to reset the secure store when you want to start the OAuth flow again
-  //resetSecureStore();
+  // resetSecureStore();
 
   const checkAuthentication = async () => {
     try {
@@ -111,7 +116,7 @@ const App = () => {
 
   React.useEffect(() => {
     testApiConnection();
-    checkAuthentication();
+    // checkAuthentication();
   }, []);
 
   //send the food diary entry to the backend
